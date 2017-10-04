@@ -1,73 +1,166 @@
-# ![Assessment 1][banner]
+# Assessment 1
 
-This repository can be forked for [**assessment 1**][a1] of [Frontend 3][fe3]
-at [**@CMDA**][cmda].
+De opdracht voor assessment 1 bestaat uit het visualiseren van bepaalde data. Ik heb gekozen om te gaan werken met de data over de temperatuur. 
 
-## TODO
+Ik ben allereerst gaan kijken op https://bl.ocks.org/mbostock/3883195 en heb de area chart uitgekozen om mee aan de slag te gaan. Vervolgens heb ik de volgende files aan gemaakt:
 
-*   [ ] [GitHub Pages](#github-pages)
-*   [ ] [Metadata](#metadata)
-*   [ ] [Workflow](#workflow)
-*   [ ] Replace this document in your fork with your own readme!
+## Aangemaakte files:
+- temperature.csv	
+- temperature.html	
+- temperature.js
+- temperature.css
 
-## GitHub Pages
+## Aangepaste code
+Ik ben toen gaan werken met de code heb de volgende dingen aangepast:
 
-Set up [GitHub Pages][pages] for this fork through the **Settings** pane.  Use
-the **Master branch** as its source.
+### Van
+```html
+<!DOCTYPE html>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
 
-## Metadata
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-Edit the **description** and **url** of your repository.  Click on edit above
-the green Clone or download button and fill in your correct information.
+var parseTime = d3.timeParse("%d-%b-%y");
 
-## Workflow
+var x = d3.scaleTime()
+    .rangeRound([0, width]);
 
-How you go about your project is up to you other than that it must meet the
-given requirements.  The following steps may help to tackle this challenge
-though.
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
 
-###### Explore
+var area = d3.area()
+    .x(function(d) { return x(d.date); })
+    .y1(function(d) { return y(d.close); });
 
-Explore the [data][].  Make sense of the rows, columns, and what they contain.
-Investigate interesting aspects and possible outcomes.  Figure out what type of
-chart you want and sketch your visualisation.
+d3.tsv("data.tsv", function(d) {
+  d.date = parseTime(d.date);
+  d.close = +d.close;
+  return d;
+}, function(error, data) {
+  if (error) throw error;
 
-List the features needed to make your chart work and make sure they match our
-[rubric][].  For example, pie charts or donut charts often lack features needed
-to get good grades in the **application of subject matter** category.  You must
-compensate with other useful features to get a good grade in this case.
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain([0, d3.max(data, function(d) { return d.close; })]);
+  area.y0(y(0));
 
-Pick the most enticing data and copy it to your fork.
+  g.append("path")
+      .datum(data)
+      .attr("fill", "steelblue")
+      .attr("d", area);
 
-###### Process
+  g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x));
 
-Describe the purpose and background of your visualisation in your fork’s readme.
-Portray your data and list the d3 features.
+  g.append("g")
+      .call(d3.axisLeft(y))
+    .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Price ($)");
+});
 
-Start writing code.  Feel free to use example code found on the web but make
-sure to include correct citations.  Use inline code comments to describe
-anything of interest.  Don’t forget to document your process.
+</script>
+```
+### Naar
+```js
+// Deze codes zijn bezit van https://bl.ocks.org/mbostock/3883195 en heb ik naar mijn eigen kunnen aangepast van deze assessment.
 
-###### Review
+// Ik maak hier een variabele aan die ik svg noem en stop d3.select in om zo het svg element in de html te selecteren.
+var svg = d3.select("svg");
+var margin = {
+     top: 20,
+     right: 20,
+     bottom: 30,
+     left: 50
+ };
+/*Ik maak hier variabelen width en heigth aan en door middel van attr geef ik de variabele svg een with -marginleft - marginright*/
+ var width = +svg.attr("width") - margin.left - margin.right;
+ var height = +svg.attr("height") - margin.top - margin.bottom;
+ var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-Finish up your readme and review your project.  Audit the code and docs.
-Evaluate whether the project matches our [rubric][] and make changes where
-needed.
+// Met "%Y%0m%0d" selecteer ik de manier waarom de datum is gemaakt in de csv.
+var parseTime = d3.timeParse("%Y%0m%0d");
 
-Include anything you’re particularly proud of and mention anything that was
-exceptionally hard to accomplish in your readme to make sure lecturers don’t
-miss it!  🌟
 
-[banner]: https://cdn.rawgit.com/cmda-fe3/logo/3b150735/banner-assessment-1.svg
+// dmv de rangeRound width zorg ik ervoor dat de x as horizontaal loopt en bij 0 begint
+ var x = d3.scaleTime()
+     .rangeRound([0, width]);
 
-[a1]: https://github.com/cmda-fe3/course-17-18/tree/master/assessment-1#description
+ var y = d3.scaleLinear()
+     .rangeRound([height, 0]);
 
-[data]: https://github.com/cmda-fe3/course-17-18/tree/master/assessment-1#data
+// deze functie (d) returned de date binnen de area.
+ var area = d3.area()
+     .x(function (d) {
+         return x(d.date);
+     })
+ // deze functie (d) returned de temperatuur binnen de area.
+     .y1(function (d) {
+         return y(d.temp);
+     });
 
-[rubric]: https://github.com/cmda-fe3/course-17-18/tree/master/assessment-1#rubric
 
-[fe3]: https://github.com/cmda-fe3
+// hiermee wordt het bestand temperature.csv aangeroepen
+ d3.csv("temperature.csv", function (d) {
+     d.date = parseTime(d.date);
+     d.temp = +d.temp;
+     return d;
+ }, function (error, data) {
+     if (error) throw error;
 
-[cmda]: https://github.com/cmda
+     x.domain(d3.extent(data, function (d) {
+         return d.date;
+     }));
+     
+     // met de -6 geef ik aan de de y-as moet beginnen bij -6 graden.
+     y.domain([-6, d3.max(data, function (d) {
+         return d.temp;
+     })]);
+     area.y0(y(0));
+     
+     // de append geeft bepaalde content mee aan geslecteerde elementen. in dit gebal is dat het g element
 
-[pages]: https://pages.github.com
+     g.append("path")
+         .datum(data)
+         .attr("fill", "steelblue") // hiermee krijg de "path" dus een blauwe kleur. 
+         .attr("d", area);
+
+
+     
+     g.append("g")
+         .attr("transform", "translate(0," + height + ")")
+         .call(d3.axisBottom(x))
+         .append("text")
+         .attr("fill", "#000")
+         .attr("transform", "rotate(-90)")
+         .attr("x", 6)
+         .attr("dy", "90em")
+         .attr("text-anchor", "end")
+         .text("Date");
+
+
+     g.append("g")
+         .call(d3.axisLeft(y))
+         .append("text")
+         .attr("fill", "#000")
+         .attr("transform", "rotate(-90)")
+         .attr("y", 6)
+         .attr("dy", "0.71em")
+         .attr("text-anchor", "end")
+         .text("Temperature");
+ });
+ ```
+ 
+ ## License
+ 
+ MIT @ Björn Völkers
